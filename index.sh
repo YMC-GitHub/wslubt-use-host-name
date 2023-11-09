@@ -606,33 +606,28 @@ oldname=
 # exit 0;
 
 function put_file_wsl_conf(){
-f=/etc/wsl.conf
+    f=/etc/wsl.conf
 
-# echo "[task] set $f"
+    echo "[info] touch $f"
+    # add file if does not exsit.
+    [ ! -e $f ] && touch $f
 
-# add file if does not exsit.
-[ ! -e $f ] && touch $f
-
-# txt="
-# [network]
-# hostname=$newname
-# generateHosts = false
-# "
-# key=network;cat $f | grep "\[$key\]" > /dev/null 2>&1 ; [ $? -eq 1 ] && echo "$txt" >>  $f
-
-# add [network] if does not exsit.
-key=network;cat $f | grep "\[$key\]" > /dev/null 2>&1 ; [ $? -eq 1 ] && echo "[$key]" >> $f
+    echo "[info] add [network]"
+    key=network;cat $f | grep "\[$key\]" > /dev/null 2>&1 ; [ $? -eq 1 ] && echo "[$key]" >> $f
 
 
-# add hostname  if does not exsit.
-cat $f | grep "hostname=" > /dev/null 2>&1 ; if [ $? -eq 0 ] ; then sed -iE "s/hostname=.*/hostname=$newname/g" $f ; else sed -i "s/\[$key\]/\[$key\]\nhostname=$newname/g"  $f ; fi
+    echo "[info] add hostname=$newname"
+    cat $f | grep "hostname=" > /dev/null 2>&1 ; if [ $? -eq 0 ] ; then sed -iE "s/hostname=.*/hostname=$newname/g" $f ; else sed -i "s/\[$key\]/\[$key\]\nhostname=$newname/g"  $f ; fi
 
-# echo "generateHosts = false" >> $f
-cat $f | grep "generateHosts=" > /dev/null 2>&1 ; if [ $? -eq 0 ] ; then sed -iE "s/generateHosts=.*/generateHosts=false/g" $f ; else sed -i "s/\[$key\]/\[$key\]\ngenerateHosts=false/g"  $f ; fi
+    echo "[info] add generateHosts=false"
+    cat $f | grep "generateHosts=" > /dev/null 2>&1 ; if [ $? -eq 0 ] ; then sed -iE "s/generateHosts=.*/generateHosts=false/g" $f ; else sed -i "s/\[$key\]/\[$key\]\ngenerateHosts=false/g"  $f ; fi
+    
+    echo "[info] add generateResolvConf=false"
+    cat $f | grep "generateResolvConf=" > /dev/null 2>&1 ; if [ $? -eq 0 ] ; then sed -iE "s/generateResolvConf=.*/generateResolvConf=false/g" $f ; else sed -i "s/\[$key\]/\[$key\]\generateResolvConf=false/g"  $f ; fi
 }
 
 function put_file_hosts(){
-    # echo "[task] set /etc/hosts"
+    echo "[info] set /etc/hosts"
     # change in /etc/hosts
     # oldname=`hostname`` ; sed -i "s/$oldname/$newname/g" /etc/hosts
     # oldname=DESKTOP-H1IKCEF ; sed -i "s/$oldname/$newname/g" /etc/hosts
@@ -640,27 +635,28 @@ function put_file_hosts(){
 }
 
 function put_file_hostname(){
-    # echo "[task] set /etc/hostname"
+    echo "[info] set /etc/hostname"
     # change in /etc/hostname 
     [ $oldname != $newname ] &&  echo "$newname" > /etc/hostname 
 }
 function info_changed_result(){
-echo "# hostname from hostname cli"
-hostname
+    echo "[info] check changed from hostname cli"
+    hostname
 
-f=/etc/hostname;
-echo "# $f"
-cat $f | sed "/^#/d" | sed "/^$/d"
+    f=/etc/hostname;
+    echo "[info] check changed from cat /etc/hostname"
+    cat $f | sed "/^#/d" | sed "/^$/d"
 
-f=/etc/hosts;
-echo "# $f"
-cat $f | sed "/^#/d" | sed "/^$/d"
+    f=/etc/hosts;
+    echo "[info] check changed from cat $f"
+    cat $f | sed "/^#/d" | sed "/^$/d"
 
-f=/etc/wsl.conf;
-echo "# $f"
-cat $f | sed "/^#/d" | sed "/^$/d"
+    f=/etc/wsl.conf;
+    echo "[info] check changed from cat $f"
+    cat $f | sed "/^#/d" | sed "/^$/d"
 
-echo "# please reboot wsl. eg: 
+
+    echo "[info] to make it work, please reboot wsl. eg: 
 1. exit; 
 2. wsl --shutdown 
 3. wsl
